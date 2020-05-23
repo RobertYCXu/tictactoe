@@ -1,5 +1,5 @@
 class Move {
     public:
-        const int row, col;
-        Move(const int row, const int col);
+        const unsigned int row, col;
+        Move(const unsigned int row, const unsigned int col);
 };

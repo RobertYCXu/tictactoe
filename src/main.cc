@@ -7,16 +7,24 @@
 int main() {
     std::string p1;
     std::string p2;
+    int sideLength;
 
     std::cout << "Welcome to tic tac toe!" << std::endl;
     std::cout << "Player 1: " << std::endl;
     std::cin >> p1;
     std::cout << "Player 2: " << std::endl;
     std::cin >> p2;
+    std::cout << "Size of board: " << std::endl;
+    std::cin >> sideLength;
 
-    Game game(p1, p2);
+    if (sideLength <= 0) {
+        std::cout << "Board length must be >= 0!" << std::endl;
+        return 1;
+    }
 
-    std::string prompt = " 's turn. Enter your move in row col format:";
+    Game game(p1, p2, sideLength);
+
+    std::string prompt = "'s turn. Enter your move in row col format:";
 
     while (!game.over()) {
         std::cout << game << std::endl;
@@ -28,7 +36,7 @@ int main() {
             std::cout << p2 << prompt << std::endl;
         }
 
-        int row, col;
+        unsigned int row, col;
         std::cin >> row;
         if (std::cin.fail()) {
             std::cin.clear();
