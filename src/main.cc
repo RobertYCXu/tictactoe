@@ -22,7 +22,7 @@ int main() {
         return 1;
     }
 
-    Game game(p1, p2, sideLength);
+    Game game(sideLength);
 
     std::string prompt = "'s turn. Enter your move in row col format:";
 

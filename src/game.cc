@@ -4,9 +4,7 @@
 
 #include "game.h"
 
-Game::Game(std::string p1, std::string p2, unsigned int sideLength) :
-    p1( p1 ),
-    p2( p2 ),
+Game::Game(unsigned int sideLength) :
     sideLength( sideLength ),
     board(sideLength, (std::vector<Piece>(sideLength, Piece::E))),
     curState( State::P1PLAYS )
@@ -50,22 +48,27 @@ bool Game::colWin(const Piece p, unsigned int col) const {
     return true;
 }
 
-bool Game::diagWin(const Piece p) const {
-    for (unsigned int i = 0; i < sideLength; i++) {
-        if (board[i][i] != p) goto SECOND_DIAG;
+bool Game::diagWin(const Piece p, const Move &move) const {
+    if (move.row == move.col) {
+        for (unsigned int i = 0; i < sideLength; i++) {
+            if (board[i][i] != p) goto SECOND_DIAG;
+        }
+        return true;
     }
-    return true;
 
     SECOND_DIAG:;
 
-    for (unsigned int i = 0, j = sideLength - 1; i < sideLength && j >= 0; i++, j--) {
-        if (board[i][j] != p) return false;
+    if (move.row + move.col == sideLength - 1) {
+        for (unsigned int i = 0, j = sideLength - 1; i < sideLength && j >= 0; i++, j--) {
+            if (board[i][j] != p) return false;
+        }
+        return true;
     }
-    return true;
+    return false;
 }
 
 bool Game::winningMove(const Piece p, const Move &move) const {
-    if (rowWin(p, move.row) || colWin(p, move.col) || diagWin(p)) return true;
+    if (rowWin(p, move.row) || colWin(p, move.col) || diagWin(p, move)) return true;
     return false;
 }
 
