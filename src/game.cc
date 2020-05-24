@@ -125,7 +125,7 @@ void Game::processMove() {
     curState = getNextState(curMove, curPiece, winState, defaultNextState);
 
     if (curState == Game::State::P1WINS || curState == Game::State::P2WINS){
-        std::cout << p2 << " wins!" << std::endl;
+        std::cout << curPlayer << " wins!" << std::endl;
     }
     else if (curState == Game::State::TIE){
         std::cout << "Tie!" << std::endl;
