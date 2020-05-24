@@ -1,22 +1,13 @@
-#include <iostream>
-#include <iterator>
-#include <string>
-
 #include "game.h"
 
-Game::Game(unsigned int sideLength) :
+Game::Game(std::string p1, std::string p2, unsigned int sideLength) :
+    p1( p1 ),
+    p2( p2 ),
     sideLength( sideLength ),
     board(sideLength, (std::vector<Piece>(sideLength, Piece::E))),
+    numValidMoves( 0 ),
     curState( State::P1PLAYS )
 {};
-
-Game::State Game::getCurState() const {
-    return curState;
-}
-
-bool Game::over() const {
-    return curState == State::P1WINS || curState == State::P2WINS || curState == State::TIE;
-}
 
 char Game::pieceToChar(const Piece p) const {
     switch (p) {
@@ -81,25 +72,78 @@ void Game::placeMove(const Move &move, const Piece p) {
     numValidMoves += 1;
 }
 
-Game::State Game::doMove(const Move &move) {
-    if (!validMove(move)) return State::INVALID;
+Game::State Game::getNextState(
+    const Move &move,
+    const Piece &piece,
+    const State &winState,
+    const State &defaultNextState
+) const {
+    if (winningMove(piece, move)) return winState;
+    else if (gameFinished()) return State::TIE;
+    else return defaultNextState;
 
-    switch (curState) {
-        case State::P1PLAYS:
-            placeMove(move, Piece::X);
-            if (winningMove(Piece::X, move)) curState = State::P1WINS;
-            else if (gameFinished()) curState = State::TIE;
-            else curState = State::P2PLAYS;
-            return curState;
-        case State::P2PLAYS:
-            placeMove(move, Piece::O);
-            if (winningMove(Piece::O, move)) curState = State::P2WINS;
-            else if (gameFinished()) curState = State::TIE;
-            else curState = State::P1PLAYS;
-            return curState;
-        default:
-            return State::INVALID;
+}
+
+void Game::processMove() {
+    std::string prompt = "'s turn. Enter your move in row col format:";
+    Piece curPiece = Piece::E;
+    State winState = State::P1WINS;
+    State defaultNextState = State::P2PLAYS;
+
+    if (curState == Game::State::P1PLAYS) {
+        std::cout << p1 << prompt << std::endl;
+        curPiece = Piece::X;
     }
+    else {
+        std::cout << p2 << prompt << std::endl;
+        curPiece = Piece::O;
+        winState = State::P2WINS;
+        defaultNextState = State::P1PLAYS;
+    }
+
+    unsigned int row, col;
+
+    std::cin >> row;
+    if (std::cin.fail()) {
+        std::cin.clear();
+        std::cin.ignore();
+        row = -1;
+    }
+
+    std::cin >> col;
+    if (std::cin.fail()) {
+        std::cin.clear();
+        std::cin.ignore();
+        col = -1;
+    }
+
+    Move curMove = Move(row, col);
+
+    if (!validMove(curMove)) {
+        std::cout << "Invalid move!" << std::endl;
+    }
+
+    placeMove(curMove, curPiece);
+
+    curState = getNextState(curMove, curPiece, winState, defaultNextState);
+
+    if (curState == Game::State::P1WINS) {
+        std::cout << p1 << " wins!" << std::endl;
+    }
+    else if (curState == Game::State::P2WINS) {
+        std::cout << p2 << " wins!" << std::endl;
+    }
+    else if (curState == Game::State::TIE){
+        std::cout << "Tie!" << std::endl;
+    }
+}
+
+bool Game::over() const {
+    return curState == State::P1WINS || curState == State::P2WINS || curState == State::TIE;
+}
+
+void Game::printBoard() const {
+    std::cout << *this << std::endl;
 }
 
 std::string generateBorder(unsigned int lngth, char c) {
