@@ -63,10 +63,6 @@ bool Game::winningMove(const Piece p, const Move &move) const {
     return false;
 }
 
-bool Game::gameFinished() const {
-    return numValidMoves == sideLength * sideLength;
-}
-
 void Game::placeMove(const Move &move, const Piece p) {
     board[move.row][move.col] = p;
     numValidMoves += 1;
@@ -79,7 +75,7 @@ Game::State Game::getNextState(
     const State &defaultNextState
 ) const {
     if (winningMove(piece, move)) return winState;
-    else if (gameFinished()) return State::TIE;
+    else if (tie()) return State::TIE;
     else return defaultNextState;
 
 }
@@ -121,6 +117,7 @@ void Game::processMove() {
 
     if (!validMove(curMove)) {
         std::cout << "Invalid move!" << std::endl;
+        return;
     }
 
     placeMove(curMove, curPiece);
@@ -136,6 +133,10 @@ void Game::processMove() {
     else if (curState == Game::State::TIE){
         std::cout << "Tie!" << std::endl;
     }
+}
+
+bool Game::tie() const {
+    return numValidMoves == sideLength * sideLength;
 }
 
 bool Game::over() const {

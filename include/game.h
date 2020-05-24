@@ -16,12 +16,12 @@ class Game {
 
     char pieceToChar(const Piece p) const;
     bool validMove(const Move &move) const;
+    bool tie() const;
     void placeMove(const Move &move, const Piece p);
     bool winningMove(const Piece p, const Move &move) const;
     bool rowWin(const Piece p, unsigned int row) const;
     bool colWin(const Piece p, unsigned int col) const;
     bool diagWin(const Piece p, const Move &move) const;
-    bool gameFinished() const;
     State getNextState(
         const Move &move,
         const Piece &piece,
