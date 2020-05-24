@@ -59,8 +59,7 @@ bool Game::diagWin(const Piece p, const Move &move) const {
 }
 
 bool Game::winningMove(const Piece p, const Move &move) const {
-    if (rowWin(p, move.row) || colWin(p, move.col) || diagWin(p, move)) return true;
-    return false;
+    return (rowWin(p, move.row) || colWin(p, move.col) || diagWin(p, move));
 }
 
 void Game::placeMove(const Move &move, const Piece p) {
@@ -82,19 +81,20 @@ Game::State Game::getNextState(
 
 void Game::processMove() {
     std::string prompt = "'s turn. Enter your move in row col format:";
-    Piece curPiece = Piece::E;
+    Piece curPiece = Piece::X;
     State winState = State::P1WINS;
     State defaultNextState = State::P2PLAYS;
+    std::string curPlayer = p1;
 
     if (curState == Game::State::P1PLAYS) {
         std::cout << p1 << prompt << std::endl;
-        curPiece = Piece::X;
     }
     else {
         std::cout << p2 << prompt << std::endl;
         curPiece = Piece::O;
         winState = State::P2WINS;
         defaultNextState = State::P1PLAYS;
+        curPlayer = p2;
     }
 
     unsigned int row, col;
@@ -124,10 +124,7 @@ void Game::processMove() {
 
     curState = getNextState(curMove, curPiece, winState, defaultNextState);
 
-    if (curState == Game::State::P1WINS) {
-        std::cout << p1 << " wins!" << std::endl;
-    }
-    else if (curState == Game::State::P2WINS) {
+    if (curState == Game::State::P1WINS || curState == Game::State::P2WINS){
         std::cout << p2 << " wins!" << std::endl;
     }
     else if (curState == Game::State::TIE){
