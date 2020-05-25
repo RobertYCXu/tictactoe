@@ -22,12 +22,9 @@ class Game {
     bool rowWin(const Piece p, unsigned int row) const;
     bool colWin(const Piece p, unsigned int col) const;
     bool diagWin(const Piece p, const Move &move) const;
-    State getNextState(
-        const Move &move,
-        const Piece &piece,
-        const State &winState,
-        const State &defaultNextState
-    ) const;
+    void setCurState(State state);
+    void promptPlayerForMove(std::string player) const;
+    Move getMoveFromPlayer() const;
 
     public:
         Game(std::string p1, std::string p2, unsigned int sideLength);

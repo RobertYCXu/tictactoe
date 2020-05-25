@@ -67,36 +67,13 @@ void Game::placeMove(const Move &move, const Piece p) {
     numValidMoves += 1;
 }
 
-Game::State Game::getNextState(
-    const Move &move,
-    const Piece &piece,
-    const State &winState,
-    const State &defaultNextState
-) const {
-    if (winningMove(piece, move)) return winState;
-    else if (tie()) return State::TIE;
-    else return defaultNextState;
 
+void Game::promptPlayerForMove(std::string player) const {
+    std::string prompt = "'s turn. Enter your move in row col format:";
+    std::cout << player << prompt << std::endl;
 }
 
-void Game::processMove() {
-    std::string prompt = "'s turn. Enter your move in row col format:";
-    Piece curPiece = Piece::X;
-    State winState = State::P1WINS;
-    State defaultNextState = State::P2PLAYS;
-    std::string curPlayer = p1;
-
-    if (curState == Game::State::P1PLAYS) {
-        std::cout << p1 << prompt << std::endl;
-    }
-    else {
-        std::cout << p2 << prompt << std::endl;
-        curPiece = Piece::O;
-        winState = State::P2WINS;
-        defaultNextState = State::P1PLAYS;
-        curPlayer = p2;
-    }
-
+Move Game::getMoveFromPlayer() const {
     unsigned int row, col;
 
     std::cin >> row;
@@ -113,22 +90,48 @@ void Game::processMove() {
         col = -1;
     }
 
-    Move curMove = Move(row, col);
+    return Move(row, col);
+}
+
+void Game::setCurState(State state) {
+    curState = state;
+}
+
+void Game::processMove() {
+    if (curState == State::P1PLAYS) promptPlayerForMove(p1);
+    else if (curState == State::P2PLAYS) promptPlayerForMove(p2);
+    else return;
+
+    Move curMove = getMoveFromPlayer();
 
     if (!validMove(curMove)) {
         std::cout << "Invalid move!" << std::endl;
         return;
     }
 
-    placeMove(curMove, curPiece);
-
-    curState = getNextState(curMove, curPiece, winState, defaultNextState);
-
-    if (curState == Game::State::P1WINS || curState == Game::State::P2WINS){
-        std::cout << curPlayer << " wins!" << std::endl;
+    if (curState == State::P1PLAYS) {
+        placeMove(curMove, Piece::X);
+        if (winningMove(Piece::X, curMove)) {
+            setCurState(State::P1WINS);
+            std::cout << p1 << " wins!" << std::endl;
+        }
+        else if (tie()) {
+            setCurState(State::TIE);
+            std::cout << "Tie!" << std::endl;
+        }
+        else setCurState(State::P2PLAYS);
     }
-    else if (curState == Game::State::TIE){
-        std::cout << "Tie!" << std::endl;
+    else if (curState == State::P2PLAYS) {
+        placeMove(curMove, Piece::O);
+        if (winningMove(Piece::O, curMove)) {
+            setCurState(State::P2WINS);
+            std::cout << p2 << " wins!" << std::endl;
+        }
+        else if (tie()) {
+            setCurState(State::TIE);
+            std::cout << "Tie!" << std::endl;
+        }
+        else setCurState(State::P1PLAYS);
     }
 }
 
