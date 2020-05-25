@@ -67,7 +67,6 @@ void Game::placeMove(const Move &move, const Piece p) {
     numValidMoves += 1;
 }
 
-
 void Game::promptPlayerForMove(std::string player) const {
     std::string prompt = "'s turn. Enter your move in row col format:";
     std::cout << player << prompt << std::endl;
